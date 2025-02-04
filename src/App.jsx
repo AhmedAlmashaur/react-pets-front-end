@@ -1,62 +1,49 @@
 // src/App.jsx
 
 import { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min';
+import './App.css';
 
 import * as petService from './services/petService';
 
 import PetList from './components/PetList/PetList';
-import PetForm from './components/PetForm/PetForm';
 import PetDetail from './components/PetDetail/PetDetail';
+import PetForm from './components/PetForm/PetForm';
 
-const App = () => {
+function App() {
   const [pets, setPets] = useState([]);
   const [selected, setSelected] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  /*------------------FETCH FUNCTIONALITY------------------*/
-  //useEffect to fetch pets from the server
   useEffect(() => {
     const fetchPets = async () => {
       try {
         const fetchedPets = await petService.index();
-        // Don't forget to pass the error object to the new Error
+
         if (fetchedPets.err) {
           throw new Error(fetchedPets.err);
         }
+
         setPets(fetchedPets);
       } catch (err) {
-        // Log the error object
         console.log(err);
       }
     };
     fetchPets();
   }, []);
 
-  /*------------------UI FUNCTIONALITY------------------*/
-  //handleSelect function to set the selected pet
   const handleSelect = (pet) => {
     setSelected(pet);
     setIsFormOpen(false);
   };
 
-  //handleFormView function to open the form
   const handleFormView = (pet) => {
     if (!pet._id) setSelected(null);
     setIsFormOpen(!isFormOpen);
   };
 
-
-  /*------------------CRUD FUNCTIONALITY------------------*/
-
-  //CREATE - handleAddPet function to add a new pet
   const handleAddPet = async (formData) => {
     try {
-      // Remove _id and createdAt before sending to the backend
-      const { _id, createdAt, ...cleanFormData } = formData;
-
-      const newPet = await petService.create(cleanFormData);
+      const newPet = await petService.create(formData);
 
       if (newPet.err) {
         throw new Error(newPet.err);
@@ -69,13 +56,10 @@ const App = () => {
     }
   };
 
-
-  //UPDATE - handleUpdatePet function to update a pet
   const handleUpdatePet = async (formData, petId) => {
     try {
       const updatedPet = await petService.update(formData, petId);
 
-      // handle potential errors
       if (updatedPet.err) {
         throw new Error(updatedPet.err);
       }
@@ -83,6 +67,7 @@ const App = () => {
       const updatedPetList = pets.map((pet) => (
         pet._id !== updatedPet._id ? pet : updatedPet
       ));
+
       setPets(updatedPetList);
       setSelected(updatedPet);
       setIsFormOpen(false);
@@ -91,24 +76,21 @@ const App = () => {
     }
   };
 
-  //DELETE - handleDeletePet function to delete a pet
-  const handleDeletePet = async () => {
+  const handleDeletePet = async (petId) => {
     try {
-      const deletedPet = await petService.destroy(selected._id);
+      const deletedPet = await petService.destroy(petId);
 
       if (deletedPet.err) {
         throw new Error(deletedPet.err);
       }
 
-      const updatedPets = pets.filter((pet) => pet._id !== selected._id);
-      setPets(updatedPets);
+      setPets(pets.filter((pet) => pet._id !== deletedPet._id));
       setSelected(null);
+      setIsFormOpen(false);
     } catch (err) {
-      // Log the error to the console
       console.log(err);
     }
   };
-
 
   return (
     <>
@@ -125,10 +107,14 @@ const App = () => {
           handleUpdatePet={handleUpdatePet}
         />
       ) : (
-        <PetDetail selected={selected} handleFormView={handleFormView} />
+        <PetDetail
+          selected={selected}
+          handleFormView={handleFormView}
+          handleDeletePet={handleDeletePet}
+        />
       )}
     </>
   );
-};
+}
 
 export default App;

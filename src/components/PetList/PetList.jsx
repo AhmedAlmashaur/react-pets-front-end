@@ -5,10 +5,12 @@ const PetList = (props) => {
 
     // src/components/PetList.jsx
 
+    // src/components/PetList/PetList.jsx
+
     return (
-        <div>
+        <div className="sidebar-container">
             <h1>Pet List</h1>
-            <div>
+            <div className="list-container">
                 {!props.pets.length ? (
                     <h2>No Pets Yet!</h2>
                 ) : (
@@ -24,14 +26,11 @@ const PetList = (props) => {
                     </ul>
                 )}
             </div>
-            {/* Our new button! */}
             <button onClick={props.handleFormView}>
                 {props.isFormOpen ? 'Close Form' : 'New Pet'}
             </button>
         </div>
     );
-
-
 };
 
 export default PetList;

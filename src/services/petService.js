@@ -55,9 +55,11 @@ const update = async (formData, id) => {
 };
 
 // DELETE - /pets/:id
-const destroy = async (id) => {
+// src/services/petService.js
+
+const destroy = async (petId) => {
     try {
-        const res = await fetch(`${BASE_URL}/${id}`, {
+        const res = await fetch(`${BASE_URL}/${petId}`, {
             method: 'DELETE',
         });
         return res.json();
@@ -65,6 +67,7 @@ const destroy = async (id) => {
         console.log(err);
     }
 };
+
 
 
 export {

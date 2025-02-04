@@ -21,13 +21,19 @@ const PetForm = (props) => {
             [name]: name === "age" ? Number(value) : value,
         });
     };
-
     const handleSubmit = (evt) => {
         evt.preventDefault();
-        props.handleAddPet(formData);
+        if (props.selected) {
+            // Don't forget to pass both formData and the ._id!
+            props.handleUpdatePet(formData, props.selected._id);
+        } else {
+            props.handleAddPet(formData);
+        }
     };
+    // src/components/PetForm/PetForm.jsx
+
     return (
-        <div>
+        <div className="form-container">
             <form onSubmit={handleSubmit}>
                 <label htmlFor="name"> Name </label>
                 <input
